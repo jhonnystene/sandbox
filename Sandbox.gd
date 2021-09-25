@@ -193,6 +193,7 @@ func processSandboxWorld(delta):
 					else:
 						# We are an ember
 						for i in range(0, pixel["physics_passes"]):
+							SandboxWorld[x][y]["color"] = Color(0.92, rand_range(0.42, 0.89), 0.06)
 							if(IsPixelSwappable(x, y, x, y - 1) and rand_range(0, 100) < 25):
 								SwapPixels(x, y, x, y - 1)
 func updateSandboxImage():
