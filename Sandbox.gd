@@ -9,7 +9,7 @@ var SandboxWorldWidth
 var SandboxWorldHeight
 
 const TYPE_AIR = {"behavior": 0, "color": Color(0, 0, 0), "density": 0}
-const TYPE_SAND = {"behavior": 1, "color": Color(188, 217, 0), "density": 3, "physics_passes": 1, "physics_material": "powder"}
+const TYPE_SAND = {"behavior": 1, "color": Color(188, 217, 0), "density": 3, "physics_passes": 2, "physics_material": "powder"}
 const TYPE_WATER = {"behavior": 2, "color": Color(0, 112, 217), "density": 1, "physics_passes": 4, "physics_material": "liquid", "viscosity": 70, "flow_direction": -1}
 
 var Selected = TYPE_SAND
@@ -99,7 +99,7 @@ func processSandboxWorld():
 			elif(IsGroup(pixel, "powder")): # Powders
 				var cx = x
 				var cy = y
-				for i in range(0, 2):
+				for i in range(0, pixel["physics_passes"]):
 					if(IsPixelSwappable(cx, cy, cx, cy + 1)):
 						SwapPixels(cx, cy, cx, cy + 1)
 						cy += 1
@@ -117,7 +117,7 @@ func processSandboxWorld():
 				var cx = x
 				var cy = y
 				var flow_direction = pixel["flow_direction"]
-				for i in range(0, 2):
+				for i in range(0, pixel["physics_passes"]):
 					if(IsPixelSwappable(cx, cy, cx, cy + 1)):
 						SwapPixels(cx, cy, cx, cy + 1)
 						cy += 1
