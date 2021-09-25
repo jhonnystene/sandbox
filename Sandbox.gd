@@ -111,7 +111,7 @@ func generateSandboxWorld():
 
 func processSandboxWorld(delta):
 	for x in range(0, SandboxWorldWidth):
-		for y in range(SandboxWorldHeight - 1, 0, -1):
+		for y in range(SandboxWorldHeight - 1, -1, -1):
 			var pixel = SandboxWorld[x][y]
 			if(IsType(pixel, TYPE_AIR)): # Air
 				continue
