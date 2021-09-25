@@ -1,0 +1,25 @@
+[
+	{
+		"color": "#000000",
+		"density": 0,
+		"flammable": false
+	},
+	{
+		"color": "#d5e805",
+		"density": 3,
+		"flammable": 0,
+		"physics_passes": 2,
+		"physics_material": "powder",
+		"simulation_material": "none"
+	},
+	{
+		"color": "#0589e8",
+		"density": 1,
+		"flammable": "false",
+		"physics_passes": 2,
+		"physics_material": "liquid",
+		"simulation_material": "none"
+		"viscosity": 70,
+		"flow_direction": -1
+	}
+]
