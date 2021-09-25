@@ -15,8 +15,11 @@ const TYPE_AIR = {"color": Color(0, 0, 0), "density": 0, "flammable": false, "ph
 const TYPE_SAND = {"color": Color(188, 217, 0), "density": 3, "flammable": false, "physics_passes": 2, "physics_material": "powder", "simulation_material": "none"}
 
 # Liquid
-const TYPE_WATER = {"color": Color(0, 112, 217), "density": 1, "flammable": false, "physics_passes": 4, "physics_material": "liquid", "simulation_material": "none", "viscosity": 70, "flow_direction": -1}
+const TYPE_WATER = {"color": Color(0, 112, 217), "density": 1, "flammable": false, "physics_passes": 4, "physics_material": "liquid", "simulation_material": "water", "viscosity": 70, "flow_direction": -1}
 const TYPE_OIL = {"color": Color("#6e0b46"), "density": 2, "flammable": true, "burn_time": 0.3, "physics_passes": 2, "physics_material": "liquid", "simulation_material": "none", "viscosity": 95, "flow_direction": -1}
+
+# Gas
+const TYPE_STEAM = {"color": Color("#9fd6fc"), "density": 0, "flammable": false, "physics_passes": 1, "physics_material": "rising", "simulation_material": "steam"}
 
 # Solid
 const TYPE_WOOD = {"color": Color("#634f1a"), "density": 5, "flammable": true, "burn_time": 3, "physics_material": "solid", "simulation_material": "none"}
@@ -62,6 +65,17 @@ func IsEmpty(x, y):
 	if not IsPositionValid(x, y):
 		return false
 	return (IsGroup(world[x][y], "air"))
+
+func IsNeighborsBurning(x, y):
+	for sx in range(x - 1, x + 2):
+		for sy in range(y - 1, y + 2):
+			if not IsPositionValid(sx, sy):
+				continue
+			if(x == sx and y == sy):
+				continue
+			if(IsMaterial(world[sx][sy], "fire")):
+				return true
+	return false
 
 func IsType(pixel, type):
 	# TODO: make this better
@@ -168,6 +182,14 @@ func ProcessWorld(delta):
 					else:
 						# We are an ember
 						world[x][y]["color"] = Color(0.92, rand_range(0.42, 0.89), 0.06)
+			elif(IsMaterial(pixel, "water")):
+				if(IsNeighborsBurning(x, y)):
+					SetPixel(x, y, TYPE_STEAM)
+					continue # Skip physics
+			elif(IsMaterial(pixel, "steam")):
+				if not(IsMaterial(world[x][y - 1], "water") or IsMaterial(world[x][y - 1], "steam") or IsEmpty(x, y - 1)) or y == 0:
+					SetPixel(x, y, TYPE_WATER)
+					continue
 			
 			# PHYSICS SIMULATION
 			if(IsType(pixel, TYPE_AIR)): # Air
