@@ -8,20 +8,34 @@ var SandboxWorld = []
 var SandboxWorldWidth
 var SandboxWorldHeight
 
-const TYPE_AIR = {"behavior": 0, "color": Color(0, 0, 0), "density": 0}
-const TYPE_SAND = {"behavior": 1, "color": Color(188, 217, 0), "density": 3, "physics_passes": 2, "physics_material": "powder"}
-const TYPE_WATER = {"behavior": 2, "color": Color(0, 112, 217), "density": 1, "physics_passes": 4, "physics_material": "liquid", "viscosity": 70, "flow_direction": -1}
+const TYPE_AIR = {"behavior": 0, "color": Color(0, 0, 0), "density": 0, "flammable": false}
+const TYPE_SAND = {"behavior": 1, "color": Color(188, 217, 0), "density": 3, "flammable": false, "physics_passes": 2, "physics_material": "powder"}
+const TYPE_WATER = {"behavior": 2, "color": Color(0, 112, 217), "density": 1, "flammable": false, "physics_passes": 4, "physics_material": "liquid", "viscosity": 70, "flow_direction": -1}
+const TYPE_OIL = {"behavior": 2, "color": Color("#6e0b46"), "density": 2, "flammable": true, "burn_time": 0.3, "physics_passes": 2, "physics_material": "liquid", "viscosity": 95, "flow_direction": -1}
+const TYPE_FIRE = {"behavior": 3, "color": Color("#edab26"), "density": 1, "flammable": false, "physics_passes": 0, "physics_material": "fire", "time_to_live": 1}
+const TYPE_WOOD = {"behavior": 4, "color": Color("#634f1a"), "density": 5, "flammable": true, "burn_time": 3, "physics_passes": 0, "physics_material": "solid"}
+const TYPE_EMBER = {"behavior": 5, "color": Color("#d8eb10"), "density": 0, "flammable": false, "physics_passes": 1, "physics_material": "fire", "time_to_live": 1}
 
 var Selected = TYPE_SAND
 
 func PixelValid(x, y):
 	return not (x < 0 or y < 0 or x > SandboxWorldWidth - 1 or y > SandboxWorldHeight - 1)
 
-func SetPixel(x, y, value):
+func SetPixel(x, y, value, override={}):
 	if not PixelValid(x, y):
 		return
 	ChangedPixels[Vector2(x, y)] = true
-	SandboxWorld[x][y] = value
+	SandboxWorld[x][y] = value.duplicate(true)
+	if(IsGroup(value, "liquid")):
+		var flow_direction = -1
+		if(rand_range(0, 100) < 50):
+			flow_direction = 1
+		SandboxWorld[x][y]["flow_direction"] = flow_direction
+	elif(IsGroup(value, "fire")):
+		SandboxWorld[x][y]["time_to_live"] = rand_range(0.1, 0.3) + Selected["physics_passes"]
+	
+	for property in override:
+		SandboxWorld[x][y][property] = override[property]
 			
 func SwapPixels(x1, y1, x2, y2):
 	if not (PixelValid(x1, y1) and PixelValid(x2, y2)):
@@ -34,7 +48,7 @@ func SwapPixels(x1, y1, x2, y2):
 			
 func IsPixelEmpty(x, y):
 	if not PixelValid(x, y):
-		return
+		return false
 	return (SandboxWorld[x][y]["behavior"] == 0)
 
 func IsType(pixel, type):
@@ -44,6 +58,11 @@ func IsGroup(pixel, group):
 	if(pixel["behavior"] == 0):
 		return false
 	return pixel["physics_material"] == group
+
+func IsFlammable(x, y):
+	if not PixelValid(x, y):
+		return false
+	return SandboxWorld[x][y]["flammable"]
 
 func IsPixelSwappable(x1, y1, x2, y2):
 	if(x1 < 0 or y1 < 0 or x1 > SandboxWorldWidth - 1 or y1 > SandboxWorldHeight - 1):
@@ -90,7 +109,7 @@ func generateSandboxWorld():
 			SandboxWorld[x].append([])
 			SandboxWorld[x][y] = TYPE_AIR
 
-func processSandboxWorld():
+func processSandboxWorld(delta):
 	for x in range(0, SandboxWorldWidth):
 		for y in range(SandboxWorldHeight - 1, 0, -1):
 			var pixel = SandboxWorld[x][y]
@@ -144,7 +163,38 @@ func processSandboxWorld():
 						
 					else:
 						break
-				
+			elif(IsGroup(pixel, "fire")):
+				var spread_rate = 25
+				if(IsFlammable(x - 1, y - 1) and rand_range(0, 100) < spread_rate):
+					SetPixel(x - 1, y - 1, TYPE_FIRE, {"time_to_live": SandboxWorld[x - 1][y - 1]["burn_time"]})
+				if(IsFlammable(x, y - 1) and rand_range(0, 100) < spread_rate):
+					SetPixel(x, y - 1, TYPE_FIRE, {"time_to_live": SandboxWorld[x][y - 1]["burn_time"]})
+				if(IsFlammable(x + 1, y - 1) and rand_range(0, 100) < spread_rate):
+					SetPixel(x + 1, y - 1, TYPE_FIRE, {"time_to_live": SandboxWorld[x + 1][y - 1]["burn_time"]})
+				if(IsFlammable(x - 1, y) and rand_range(0, 100) < spread_rate):
+					SetPixel(x - 1, y, TYPE_FIRE, {"time_to_live": SandboxWorld[x - 1][y]["burn_time"]})
+				if(IsFlammable(x + 1, y) and rand_range(0, 100) < spread_rate):
+					SetPixel(x + 1, y, TYPE_FIRE, {"time_to_live": SandboxWorld[x + 1][y]["burn_time"]})
+				if(IsFlammable(x - 1, y + 1) and rand_range(0, 100) < spread_rate):
+					SetPixel(x - 1, y + 1, TYPE_FIRE, {"time_to_live": SandboxWorld[x - 1][y + 1]["burn_time"]})
+				if(IsFlammable(x, y + 1) and rand_range(0, 100) < spread_rate):
+					SetPixel(x, y + 1, TYPE_FIRE, {"time_to_live": SandboxWorld[x][y + 1]["burn_time"]})
+				if(IsFlammable(x + 1, y + 1) and rand_range(0, 100) < spread_rate):
+					SetPixel(x + 1, y + 1, TYPE_FIRE, {"time_to_live": SandboxWorld[x + 1][y + 1]["burn_time"]})
+					
+				SandboxWorld[x][y]["time_to_live"] -= delta
+				if(SandboxWorld[x][y]["time_to_live"] <= 0):
+					SetPixel(x, y, TYPE_AIR)
+				else:
+					if(pixel["physics_passes"] == 0):
+						# Create embers periodically
+						if(IsPixelEmpty(x, y - 1) and rand_range(0, 100) > 10):
+							SetPixel(x, y - 1, TYPE_EMBER, {"time_to_live": rand_range(0.5, 1)})
+					else:
+						# We are an ember
+						for i in range(0, pixel["physics_passes"]):
+							if(IsPixelSwappable(x, y, x, y - 1) and rand_range(0, 100) < 25):
+								SwapPixels(x, y, x, y - 1)
 func updateSandboxImage():
 	# Fill in image
 	SandboxImage.lock()
@@ -158,7 +208,7 @@ func updateSandboxImage():
 	$Display.texture.create_from_image(SandboxImage)
 	$Display.texture.set_flags(0)
 			
-func _process(_delta):
+func _process(delta):
 	if(Input.is_mouse_button_pressed(BUTTON_LEFT)):
 		var x = get_viewport().get_mouse_position().x / $Display.scale.x
 		var y = get_viewport().get_mouse_position().y / $Display.scale.y
@@ -168,13 +218,13 @@ func _process(_delta):
 		for sx in range(x - cursor_offset, x + cursor_offset):
 			for sy in range(y - cursor_offset, y + cursor_offset):
 				SetPixel(sx, sy, Selected)
-				if(Selected == TYPE_WATER):
+				if(IsGroup(Selected, "liquid")):
 					var flow_direction = -1
 					if(rand_range(0, 100) < 50):
 						flow_direction = 1
 					SandboxWorld[sx][sy]["flow_direction"] = flow_direction
 		
-	processSandboxWorld()
+	processSandboxWorld(delta)
 	updateSandboxImage()
 
 func _ready():
@@ -186,3 +236,12 @@ func _on_SandButton_pressed():
 
 func _on_WaterButton_pressed():
 	Selected = TYPE_WATER
+
+func _on_OilButton_pressed():
+	Selected = TYPE_OIL
+
+func _on_FireButton_pressed():
+	Selected = TYPE_FIRE
+
+func _on_WoodButton_pressed():
+	Selected = TYPE_WOOD
