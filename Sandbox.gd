@@ -118,7 +118,7 @@ func processSandboxWorld(delta):
 			elif(IsGroup(pixel, "powder")): # Powders
 				var cx = x
 				var cy = y
-				for i in range(0, pixel["physics_passes"]):
+				for _i in range(0, pixel["physics_passes"]):
 					if(IsPixelSwappable(cx, cy, cx, cy + 1)):
 						SwapPixels(cx, cy, cx, cy + 1)
 						cy += 1
@@ -136,7 +136,7 @@ func processSandboxWorld(delta):
 				var cx = x
 				var cy = y
 				var flow_direction = pixel["flow_direction"]
-				for i in range(0, pixel["physics_passes"]):
+				for _i in range(0, pixel["physics_passes"]):
 					if(IsPixelSwappable(cx, cy, cx, cy + 1)):
 						SwapPixels(cx, cy, cx, cy + 1)
 						cy += 1
@@ -192,7 +192,7 @@ func processSandboxWorld(delta):
 							SetPixel(x, y - 1, TYPE_EMBER, {"time_to_live": rand_range(0.5, 1)})
 					else:
 						# We are an ember
-						for i in range(0, pixel["physics_passes"]):
+						for _i in range(0, pixel["physics_passes"]):
 							SandboxWorld[x][y]["color"] = Color(0.92, rand_range(0.42, 0.89), 0.06)
 							if(IsPixelSwappable(x, y, x, y - 1) and rand_range(0, 100) < 25):
 								SwapPixels(x, y, x, y - 1)
