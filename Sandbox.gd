@@ -12,21 +12,25 @@ var worldHeight
 const TYPE_AIR = {"color": Color(0, 0, 0), "density": 0, "flammable": false, "physics_material": "air", "simulation_material": "none"}
 
 # Powder
-const TYPE_SAND = {"color": Color(188, 217, 0), "density": 3, "flammable": false, "physics_passes": 2, "physics_material": "powder", "simulation_material": "none"}
+const TYPE_SAND = {"color": Color(188, 217, 0), "density": 3, "flammable": false, "physics_passes": 2, "physics_material": "powder", "physics_chance": 75, "simulation_material": "none"}
 
 # Liquid
-const TYPE_WATER = {"color": Color(0, 112, 217), "density": 1, "flammable": false, "physics_passes": 4, "physics_material": "liquid", "simulation_material": "water", "viscosity": 70, "flow_direction": -1}
-const TYPE_OIL = {"color": Color("#6e0b46"), "density": 2, "flammable": true, "burn_time": 0.3, "physics_passes": 2, "physics_material": "liquid", "simulation_material": "none", "viscosity": 95, "flow_direction": -1}
+const TYPE_WATER = {"color": Color(0, 112, 217), "density": 1, "flammable": false, "physics_passes": 3, "physics_material": "liquid", "physics_chance": 75, "simulation_material": "water", "viscosity": 70, "flow_direction": -1}
+const TYPE_OIL = {"color": Color("#6e0b46"), "density": 2, "flammable": true, "burn_time": 0.3, "physics_passes": 2, "physics_material": "liquid", "physics_chance": 75, "simulation_material": "none", "viscosity": 95, "flow_direction": -1}
 
 # Gas
-const TYPE_STEAM = {"color": Color("#9fd6fc"), "density": 0, "flammable": false, "physics_passes": 1, "physics_material": "rising", "simulation_material": "steam"}
+const TYPE_STEAM = {"color": Color("#9fd6fc"), "density": 0, "flammable": false, "physics_passes": 1, "physics_material": "rising", "physics_chance": 75, "flow_direction": -1, "simulation_material": "steam"}
+const TYPE_METHANE = {"color": Color("#7a08a3"), "density": 0, "flammable": true, "burn_time": 0.2, "physics_passes": 1, "physics_material": "rising", "physics_chance": 75, "flow_direction": -1, "simulation_material": "none"}
 
 # Solid
 const TYPE_WOOD = {"color": Color("#634f1a"), "density": 5, "flammable": true, "burn_time": 3, "physics_material": "solid", "simulation_material": "none"}
+const TYPE_FUSE = {"color": Color("#27a308"), "density": 5, "flammable": true, "burn_time": 0.3, "physics_material": "solid", "simulation_material": "none"}
 
 # Burning
-const TYPE_FIRE = {"color": Color("#edab26"), "density": 1, "flammable": false, "physics_material": "none", "simulation_material": "fire", "time_to_live": 0.1}
-const TYPE_EMBER = {"color": Color("#d8eb10"), "density": 0, "flammable": false, "physics_passes": 1, "physics_material": "rising", "simulation_material": "fire", "time_to_live": 1}
+const TYPE_FIRE = {"color": Color("#edab26"), "density": 9, "flammable": false, "physics_material": "none", "simulation_material": "fire", "time_to_live": 0.1}
+const TYPE_EMBER = {"color": Color("#d8eb10"), "density": 0, "flammable": false, "physics_passes": 1, "physics_material": "rising", "physics_chance": 75, "flow_direction": -1, "simulation_material": "fire", "time_to_live": 1}
+
+const TYPE_TRANSLATION = {"Sand": TYPE_SAND, "Water": TYPE_WATER, "Oil": TYPE_OIL, "Fire": TYPE_FIRE, "Wood": TYPE_WOOD, "Fuse": TYPE_FUSE, "Methane": TYPE_METHANE}
 
 var selected = TYPE_SAND
 
@@ -39,7 +43,7 @@ func SetPixel(x, y, value, override={}):
 	changedPixels[Vector2(x, y)] = true
 	world[x][y] = value.duplicate(true)
 	# Physics randomization
-	if(IsGroup(value, "liquid")):
+	if(IsGroup(value, "liquid") or IsGroup(value, "rising")):
 		var flow_direction = -1
 		if(rand_range(0, 100) < 50):
 			flow_direction = 1
@@ -198,6 +202,8 @@ func ProcessWorld(delta):
 				var cx = x
 				var cy = y
 				for _i in range(0, pixel["physics_passes"]):
+					if(rand_range(0, 100) < pixel["physics_chance"]):
+						continue
 					if(IsSwappable(cx, cy, cx, cy + 1)):
 						SwapPixels(cx, cy, cx, cy + 1)
 						cy += 1
@@ -211,24 +217,29 @@ func ProcessWorld(delta):
 						cy += 1
 					else:
 						break
-			elif(IsGroup(pixel, "liquid")): # Water
+			elif(IsGroup(pixel, "liquid") or IsGroup(pixel, "rising")):
 				var cx = x
 				var cy = y
 				var flow_direction = pixel["flow_direction"]
+				var y_direction = 1
+				if(IsGroup(pixel, "rising")):
+					y_direction = -1
 				for _i in range(0, pixel["physics_passes"]):
+					if(rand_range(0, 100) < pixel["physics_chance"]):
+						continue
 					var do_not_propagate_sideways = false
 					
-					if(IsSwappable(cx, cy, cx, cy + 1)):
-						SwapPixels(cx, cy, cx, cy + 1)
+					if(IsSwappable(cx, cy, cx, cy + y_direction)):
+						SwapPixels(cx, cy, cx, cy + y_direction)
 						cy += 1
 						
-					elif(IsSwappable(cx, cy, cx + flow_direction, cy + 1)):
-						SwapPixels(cx, cy, cx + flow_direction, cy + 1)
+					elif(IsSwappable(cx, cy, cx + flow_direction, cy + y_direction)):
+						SwapPixels(cx, cy, cx + flow_direction, cy + y_direction)
 						cx += flow_direction
 						cy += 1
 						
-					elif(IsSwappable(cx, cy, cx - flow_direction, cy + 1)):
-						SwapPixels(cx, cy, cx - flow_direction, cy + 1)
+					elif(IsSwappable(cx, cy, cx - flow_direction, cy + y_direction)):
+						SwapPixels(cx, cy, cx - flow_direction, cy + y_direction)
 						cx -= flow_direction
 						cy += 1
 						
@@ -244,10 +255,6 @@ func ProcessWorld(delta):
 						
 					else:
 						break
-			elif(IsGroup(pixel, "rising")):
-				for _i in range(0, pixel["physics_passes"]):
-					if(IsSwappable(x, y, x, y - 1) and rand_range(0, 100) < 25):
-						SwapPixels(x, y, x, y - 1)
 func UpdateSandboxImage():
 	# Fill in image
 	sandboxImage.lock()
@@ -262,6 +269,8 @@ func UpdateSandboxImage():
 	$Display.texture.set_flags(0)
 			
 func _process(delta):
+	selected = TYPE_TRANSLATION[$UI/OptionButton.text]
+	
 	if(Input.is_mouse_button_pressed(BUTTON_LEFT)):
 		var x = get_viewport().get_mouse_position().x / $Display.scale.x
 		var y = get_viewport().get_mouse_position().y / $Display.scale.y
@@ -270,31 +279,29 @@ func _process(delta):
 		
 		for sx in range(x - cursor_offset, x + cursor_offset):
 			for sy in range(y - cursor_offset, y + cursor_offset):
+				if not(IsPositionValid(sx, sy)):
+					continue
 				SetPixel(sx, sy, selected)
 				if(IsGroup(selected, "liquid")):
 					var flow_direction = -1
 					if(rand_range(0, 100) < 50):
 						flow_direction = 1
 					world[sx][sy]["flow_direction"] = flow_direction
+	elif(Input.is_mouse_button_pressed(BUTTON_RIGHT)):
+		var x = get_viewport().get_mouse_position().x / $Display.scale.x
+		var y = get_viewport().get_mouse_position().y / $Display.scale.y
+		var cursor_size = $UI/HSlider.value
+		var cursor_offset = floor(cursor_size / 2)
 		
+		for sx in range(x - cursor_offset, x + cursor_offset):
+			for sy in range(y - cursor_offset, y + cursor_offset):
+				SetPixel(sx, sy, TYPE_AIR)
 	ProcessWorld(delta)
 	UpdateSandboxImage()
 
 func _ready():
+	for type in TYPE_TRANSLATION:
+		$UI/OptionButton.add_item(type)
+	
 	GenerateWorld()
 	GenerateSandboxImage()
-
-func _on_SandButton_pressed():
-	selected = TYPE_SAND
-
-func _on_WaterButton_pressed():
-	selected = TYPE_WATER
-
-func _on_OilButton_pressed():
-	selected = TYPE_OIL
-
-func _on_FireButton_pressed():
-	selected = TYPE_FIRE
-
-func _on_WoodButton_pressed():
-	selected = TYPE_WOOD

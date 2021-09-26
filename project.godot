@@ -12,12 +12,17 @@ config_version=4
 
 config/name="sandbox"
 run/main_scene="res://Sandbox.tscn"
-config/icon="res://icon.png"
+boot_splash/image="res://Branding/spr_splash.png"
+config/icon="res://Branding/Icon.png"
 
 [debug]
 
 settings/fps/force_fps=30
 settings/stdout/print_fps=true
+
+[display]
+
+window/size/resizable=false
 
 [physics]
 

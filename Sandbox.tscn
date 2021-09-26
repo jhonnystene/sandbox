@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Sandbox.gd" type="Script" id=1]
+[ext_resource path="res://Music/Calm2 - Childhood Friends.ogg" type="AudioStream" id=2]
 
 [sub_resource type="ImageTexture" id=1]
 flags = 0
@@ -21,59 +22,32 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="SandButton" type="Button" parent="UI"]
-margin_right = 12.0
-margin_bottom = 20.0
-text = "Sand"
-
-[node name="WaterButton" type="Button" parent="UI"]
-margin_top = 20.1298
-margin_right = 50.0
-margin_bottom = 40.1298
-text = "Water"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="OilButton" type="Button" parent="UI"]
-margin_top = 39.8623
-margin_right = 50.0
-margin_bottom = 59.8623
-text = "Oil"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="FireButton" type="Button" parent="UI"]
-margin_left = 0.198425
-margin_top = 60.3001
-margin_right = 50.1984
-margin_bottom = 80.3001
-text = "Fire"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="WoodButton" type="Button" parent="UI"]
-margin_left = -0.404724
-margin_top = 78.6068
-margin_right = 49.5953
-margin_bottom = 98.6068
-text = "Wood"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="HSlider" type="HSlider" parent="UI"]
-margin_left = 77.0
-margin_right = 278.0
-margin_bottom = 16.0
+margin_left = 6.54174
+margin_top = 6.98991
+margin_right = 207.542
+margin_bottom = 22.9899
 min_value = 2.0
 max_value = 9.0
 value = 2.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[connection signal="pressed" from="UI/SandButton" to="." method="_on_SandButton_pressed"]
-[connection signal="pressed" from="UI/WaterButton" to="." method="_on_WaterButton_pressed"]
-[connection signal="pressed" from="UI/OilButton" to="." method="_on_OilButton_pressed"]
-[connection signal="pressed" from="UI/FireButton" to="." method="_on_FireButton_pressed"]
-[connection signal="pressed" from="UI/WoodButton" to="." method="_on_WoodButton_pressed"]
+[node name="Label" type="Label" parent="UI/HSlider"]
+margin_left = 63.0
+margin_top = 15.5
+margin_right = 130.0
+margin_bottom = 29.5
+text = "Brush Size"
+
+[node name="OptionButton" type="OptionButton" parent="UI"]
+margin_left = 215.401
+margin_top = 5.08246
+margin_right = 244.401
+margin_bottom = 25.0825
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 2 )
+volume_db = -13.126
+autoplay = true

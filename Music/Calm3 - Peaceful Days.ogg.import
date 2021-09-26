@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/Calm3 - Peaceful Days.ogg-f0d9a292857500290782170944f9c24e.oggstr"
+
+[deps]
+
+source_file="res://Music/Calm3 - Peaceful Days.ogg"
+dest_files=[ "res://.import/Calm3 - Peaceful Days.ogg-f0d9a292857500290782170944f9c24e.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

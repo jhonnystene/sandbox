@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/Calm1 - A Place I Call Home.ogg-e94ae2e84e04967751bafb6ae472f7f2.oggstr"
+
+[deps]
+
+source_file="res://Music/Calm1 - A Place I Call Home.ogg"
+dest_files=[ "res://.import/Calm1 - A Place I Call Home.ogg-e94ae2e84e04967751bafb6ae472f7f2.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

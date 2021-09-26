@@ -1,0 +1,8 @@
+- Adjusted UI
+- Fixed crashing bug
+- Slowed down water simulation
+- Added fuse, a solid item that burns quickly
+- Added methane, a gas that can be ignited
+- Improved gas simulation
+- Added pixel spreading to moving pixels
+- Improved fire simulation

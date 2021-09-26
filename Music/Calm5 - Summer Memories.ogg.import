@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/Calm5 - Summer Memories.ogg-28c947b2b13fac0cfd71b46c809872e1.oggstr"
+
+[deps]
+
+source_file="res://Music/Calm5 - Summer Memories.ogg"
+dest_files=[ "res://.import/Calm5 - Summer Memories.ogg-28c947b2b13fac0cfd71b46c809872e1.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0
