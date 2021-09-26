@@ -13,6 +13,7 @@ const TYPE_AIR = {"color": Color(0, 0, 0), "density": 0, "flammable": false, "ph
 
 # Powder
 const TYPE_SAND = {"color": Color(188, 217, 0), "density": 3, "flammable": false, "physics_passes": 2, "physics_material": "powder", "physics_chance": 75, "simulation_material": "none"}
+const TYPE_SALT = {"color": Color("#FFFFFF"), "density": 3, "flammable": false, "physics_passes": 2, "physics_material": "powder", "physics_chance": 75, "simulation_material": "salt"}
 
 # Liquid
 const TYPE_WATER = {"color": Color(0, 112, 217), "density": 1, "flammable": false, "physics_passes": 3, "physics_material": "liquid", "physics_chance": 75, "simulation_material": "water", "viscosity": 70, "flow_direction": -1}
@@ -30,7 +31,7 @@ const TYPE_FUSE = {"color": Color("#27a308"), "density": 5, "flammable": true, "
 const TYPE_FIRE = {"color": Color("#edab26"), "density": 9, "flammable": false, "physics_material": "none", "simulation_material": "fire", "time_to_live": 0.1}
 const TYPE_EMBER = {"color": Color("#d8eb10"), "density": 0, "flammable": false, "physics_passes": 1, "physics_material": "rising", "physics_chance": 75, "flow_direction": -1, "simulation_material": "fire", "time_to_live": 1}
 
-const TYPE_TRANSLATION = {"Sand": TYPE_SAND, "Water": TYPE_WATER, "Oil": TYPE_OIL, "Fire": TYPE_FIRE, "Wood": TYPE_WOOD, "Fuse": TYPE_FUSE, "Methane": TYPE_METHANE}
+const TYPE_TRANSLATION = {"Sand": TYPE_SAND, "Water": TYPE_WATER, "Oil": TYPE_OIL, "Fire": TYPE_FIRE, "Wood": TYPE_WOOD, "Fuse": TYPE_FUSE, "Methane": TYPE_METHANE, "Salt": TYPE_SALT}
 
 var selected = TYPE_SAND
 
@@ -78,6 +79,17 @@ func IsNeighborsBurning(x, y):
 			if(x == sx and y == sy):
 				continue
 			if(IsMaterial(world[sx][sy], "fire")):
+				return true
+	return false
+
+func IsInWater(x, y):
+	for sx in range(x - 1, x + 2):
+		for sy in range(y - 1, y + 2):
+			if not IsPositionValid(sx, sy):
+				continue
+			if(x == sx and y == sy):
+				continue
+			if(IsMaterial(world[sx][sy], "water")):
 				return true
 	return false
 
@@ -194,6 +206,9 @@ func ProcessWorld(delta):
 				if not(IsMaterial(world[x][y - 1], "water") or IsMaterial(world[x][y - 1], "steam") or IsEmpty(x, y - 1)) or y == 0:
 					SetPixel(x, y, TYPE_WATER)
 					continue
+			elif(IsMaterial(pixel, "salt")):
+				if(IsInWater(x, y) and rand_range(0, 100) < 15):
+					SetPixel(x, y, TYPE_WATER)
 			
 			# PHYSICS SIMULATION
 			if(IsType(pixel, TYPE_AIR)): # Air
