@@ -22,11 +22,21 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="ColorRect" type="ColorRect" parent="UI"]
+margin_right = 1024.0
+margin_bottom = 40.0
+hint_tooltip = "Version 1.1.0 - Thank you for playing!"
+color = Color( 0, 0, 0, 0.611765 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="HSlider" type="HSlider" parent="UI"]
-margin_left = 6.54174
-margin_top = 6.98991
-margin_right = 207.542
-margin_bottom = 22.9899
+margin_left = 7.48562
+margin_top = 5.10216
+margin_right = 208.486
+margin_bottom = 21.1022
+hint_tooltip = "Brush size."
 min_value = 2.0
 max_value = 9.0
 value = 2.0
@@ -39,20 +49,35 @@ margin_left = 63.0
 margin_top = 15.5
 margin_right = 130.0
 margin_bottom = 29.5
+hint_tooltip = "Label telling you the above slider is for brush size."
+mouse_filter = 1
 text = "Brush Size"
 
 [node name="OptionButton" type="OptionButton" parent="UI"]
-margin_left = 215.401
-margin_top = 5.08246
-margin_right = 244.401
-margin_bottom = 25.0825
+margin_left = 215.776
+margin_top = 8.82822
+margin_right = 244.776
+margin_bottom = 28.8282
+hint_tooltip = "Currently selected cell type."
 
 [node name="Hyperspeed" type="CheckBox" parent="UI"]
 margin_left = 914.062
-margin_top = 2.6727
+margin_top = 8.1727
 margin_right = 1019.06
-margin_bottom = 26.6727
+margin_bottom = 32.1727
+hint_tooltip = "Speeds up simulation but ruins some effects."
 text = "Hyperspeed"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Paused" type="CheckBox" parent="UI"]
+margin_left = 841.665
+margin_top = 7.94888
+margin_right = 915.665
+margin_bottom = 31.9489
+hint_tooltip = "Pauses simulation."
+text = "Paused"
 __meta__ = {
 "_edit_use_anchors_": false
 }

@@ -8,3 +8,9 @@
 - Improved fire simulation
 - Added salt, a powder that dissolves in water
 - Added "Hyperspeed" option that speeds up simulation but makes it look worse
+- Added hint text on UI elements
+- Added darker background on UI bar (although you can't normally see it haha)
+- Added acid, a liquid that melts through other cells
+- Added stone, a solid, non-flammable material
+- Added lava, a material that burns through and sets fire to flammable materials.
+
