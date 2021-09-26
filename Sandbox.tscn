@@ -47,6 +47,16 @@ margin_top = 5.08246
 margin_right = 244.401
 margin_bottom = 25.0825
 
+[node name="Hyperspeed" type="CheckBox" parent="UI"]
+margin_left = 914.062
+margin_top = 2.6727
+margin_right = 1019.06
+margin_bottom = 26.6727
+text = "Hyperspeed"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 2 )
 volume_db = -13.126

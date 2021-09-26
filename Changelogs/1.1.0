@@ -7,3 +7,4 @@
 - Added pixel spreading to moving pixels
 - Improved fire simulation
 - Added salt, a powder that dissolves in water
+- Added "Hyperspeed" option that speeds up simulation but makes it look worse

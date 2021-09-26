@@ -35,6 +35,9 @@ const TYPE_TRANSLATION = {"Sand": TYPE_SAND, "Water": TYPE_WATER, "Oil": TYPE_OI
 
 var selected = TYPE_SAND
 
+func IsHyperspeed():
+	return $UI/Hyperspeed.pressed
+
 func IsPositionValid(x, y):
 	return not (x < 0 or y < 0 or x > worldWidth - 1 or y > worldHeight - 1)
 
@@ -217,7 +220,7 @@ func ProcessWorld(delta):
 				var cx = x
 				var cy = y
 				for _i in range(0, pixel["physics_passes"]):
-					if(rand_range(0, 100) < pixel["physics_chance"]):
+					if(rand_range(0, 100) < pixel["physics_chance"] and not IsHyperspeed()):
 						continue
 					if(IsSwappable(cx, cy, cx, cy + 1)):
 						SwapPixels(cx, cy, cx, cy + 1)
@@ -240,7 +243,7 @@ func ProcessWorld(delta):
 				if(IsGroup(pixel, "rising")):
 					y_direction = -1
 				for _i in range(0, pixel["physics_passes"]):
-					if(rand_range(0, 100) < pixel["physics_chance"]):
+					if(rand_range(0, 100) < pixel["physics_chance"] and not IsHyperspeed()):
 						continue
 					var do_not_propagate_sideways = false
 					
