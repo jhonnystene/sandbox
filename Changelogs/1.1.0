@@ -13,4 +13,4 @@
 - Added acid, a liquid that melts through other cells
 - Added stone, a solid, non-flammable material
 - Added lava, a material that burns through and sets fire to flammable materials.
-
+- Fixed fast cursor movements causing holes

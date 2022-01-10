@@ -1,5 +1,18 @@
 extends Node2D
 
+# TODO:
+# - Fix hyperspeed messing up effects
+# - Make lava turn into stone when touching water
+# - Add some way to neutralize acid
+# - Move top bar out of the way when the user has their cursor near it and the mouse down
+# - Add metal
+# - Make lava turn stone into more lava
+# - Add saltwater
+# - Make acid and saltwater corrode metal
+
+var lastCursorX = -1
+var lastCursorY = -1
+
 var sandboxTexture
 var sandboxImage
 
@@ -310,21 +323,69 @@ func _process(delta):
 	selected = TYPE_TRANSLATION[$UI/OptionButton.text]
 	
 	if(Input.is_mouse_button_pressed(BUTTON_LEFT)):
-		var x = get_viewport().get_mouse_position().x / $Display.scale.x
-		var y = get_viewport().get_mouse_position().y / $Display.scale.y
+		var cursorX = get_viewport().get_mouse_position().x / $Display.scale.x
+		var cursorY = get_viewport().get_mouse_position().y / $Display.scale.y
+		if(lastCursorX == -1):
+			lastCursorX = cursorX
+			lastCursorY = cursorY
+		
 		var cursor_size = $UI/HSlider.value
 		var cursor_offset = floor(cursor_size / 2)
 		
-		for sx in range(x - cursor_offset, x + cursor_offset):
-			for sy in range(y - cursor_offset, y + cursor_offset):
-				if not(IsPositionValid(sx, sy)):
-					continue
-				SetPixel(sx, sy, selected)
-				if(IsGroup(selected, "liquid")):
-					var flow_direction = -1
-					if(rand_range(0, 100) < 50):
-						flow_direction = 1
-					world[sx][sy]["flow_direction"] = flow_direction
+		var lowCursorX = lastCursorX
+		var highCursorX = cursorX
+		var lowCursorY = lastCursorY
+		var highCursorY = cursorY
+		
+		highCursorX += 1
+		highCursorY += 1
+		
+		var dx = highCursorX - lowCursorX
+		var dy = highCursorY - lowCursorY
+		var steps = abs(dy)
+		
+		if(abs(dx) > abs(dy)):
+			steps = abs(dx)
+		
+		var x_increment = dx / steps
+		var y_increment = dy / steps
+		
+		var px = lowCursorX
+		var py = lowCursorY
+		
+		for v in range(0, steps):
+			var x = floor(px)
+			var y = floor(py)
+			
+			for sx in range(x - cursor_offset, x + cursor_offset):
+				for sy in range(y - cursor_offset, y + cursor_offset):
+					if not(IsPositionValid(sx, sy)):
+						continue
+					SetPixel(sx, sy, selected)
+					if(IsGroup(selected, "liquid")):
+						var flow_direction = -1
+						if(rand_range(0, 100) < 50):
+							flow_direction = 1
+						world[sx][sy]["flow_direction"] = flow_direction
+			
+			x = ceil(px)
+			y = ceil(py)
+			
+			for sx in range(x - cursor_offset, x + cursor_offset):
+				for sy in range(y - cursor_offset, y + cursor_offset):
+					if not(IsPositionValid(sx, sy)):
+						continue
+					SetPixel(sx, sy, selected)
+					if(IsGroup(selected, "liquid")):
+						var flow_direction = -1
+						if(rand_range(0, 100) < 50):
+							flow_direction = 1
+						world[sx][sy]["flow_direction"] = flow_direction
+			
+			px += x_increment
+			py += y_increment 
+		lastCursorX = cursorX
+		lastCursorY = cursorY
 	elif(Input.is_mouse_button_pressed(BUTTON_RIGHT)):
 		var x = get_viewport().get_mouse_position().x / $Display.scale.x
 		var y = get_viewport().get_mouse_position().y / $Display.scale.y
@@ -334,6 +395,9 @@ func _process(delta):
 		for sx in range(x - cursor_offset, x + cursor_offset):
 			for sy in range(y - cursor_offset, y + cursor_offset):
 				SetPixel(sx, sy, TYPE_AIR)
+	else:
+		lastCursorX = -1
+		lastCursorY = -1
 	ProcessWorld(delta)
 	UpdateSandboxImage()
 
